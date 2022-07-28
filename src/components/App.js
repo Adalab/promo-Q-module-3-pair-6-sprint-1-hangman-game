@@ -1,14 +1,28 @@
 import '../styles/App.scss';
-import {useState} from 'react';
+import { useState } from 'react';
 
 function App() {
-
   const [numberOfErrors, setNumberOfErrors] = useState(0);
   const handleClick = (ev) => {
     ev.preventDefault();
     setNumberOfErrors(numberOfErrors + 1);
-    console.log("soy el boton");
-  }
+    console.log('soy el boton');
+  };
+
+  const [lastLetter, setLastLetter] = useState('');
+
+  const handleLastLetter = (ev) => {
+    console.log(ev.currentTarget.value);
+    if (ev.currentTarget.value.search(/[a-zA-ZñÑáÁéÉíÍóÓúÚ]/) === 0) {
+      // Letra buena
+      setLastLetter(ev.currentTarget.value);
+    } else {
+      // Letra mala
+      console.log('Letra mala', ev.currentTarget.value);
+    }
+
+    // ev.currentTarget.value === /^[A-Za-z]+$/ ?  setLastLetter(ev.currentTarget.value)};
+  };
 
   return (
     <div className="page">
@@ -53,9 +67,13 @@ function App() {
               type="text"
               name="last-letter"
               id="last-letter"
+              onChange={handleLastLetter}
+              value={lastLetter}
             />
           </form>
-          <button className='button' onClick={handleClick}>Incrementar</button>
+          <button className="button" onClick={handleClick}>
+            Incrementar
+          </button>
         </section>
         <section className={`dummy error-${numberOfErrors}`}>
           <span className="error-13 eye"></span>
