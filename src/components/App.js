@@ -1,5 +1,6 @@
 import '../styles/App.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import callToApi from '../services/api';
 
 function App() {
   const [numberOfErrors, setNumberOfErrors] = useState(0);
@@ -10,37 +11,54 @@ function App() {
   // };
 
   const [lastLetter, setLastLetter] = useState('');
-  const [word, setWord] = useState('katakroker');
+  const [word, setWord] = useState('');
   const [userLetters, setUserLetters] = useState([]);
+
+  useEffect(() => {
+    callToApi().then((data) => {
+      setWord(data.word);
+    });
+  }, []);
 
   const renderSolutionLetters = () => {
     const wordLetters = word.split('');
     return wordLetters.map((letter, i) => {
-      if(!userLetters.includes(letter)) {
-        return <li key={i} className="letter"></li>
+      if (!userLetters.includes(letter)) {
+        return <li key={i} className="letter"></li>;
       } else {
-        return <li key={i} className="letter">{letter}</li>
+        return (
+          <li key={i} className="letter">
+            {letter}
+          </li>
+        );
       }
-       
-    })
-  }
+    });
+  };
 
   const renderErrorLetters = () => {
     console.log(userLetters);
-     const filteredLetters =  userLetters.filter((letter) => !word.includes(letter))
-     //setNumberOfErrors()
-    return filteredLetters.map((letter) => <li className="letter">{letter}</li>)
-  }
+    const filteredLetters = userLetters.filter(
+      (letter) => !word.includes(letter)
+    );
+    // setNumberOfErrors(filteredLetters.length);
+    return filteredLetters.map((letter, index) => (
+      <li className="letter" key={index}>
+        {letter}
+      </li>
+    ));
+  };
 
   const handleLastLetter = (ev) => {
     console.log(ev.currentTarget.value);
-    if (ev.currentTarget.value.search(/[a-zA-ZñÑáÁéÉíÍóÓúÚ]/) === 0) {
+    let lowerCaseWord = ev.currentTarget.value.toLowerCase();
+
+    if (lowerCaseWord.search(/[a-zA-ZñÑáÁéÉíÍóÓúÚ]/) === 0) {
       // Letra buena
-      setLastLetter(ev.currentTarget.value);
-      setUserLetters([... userLetters,ev.currentTarget.value ])
+      setLastLetter(lowerCaseWord);
+      setUserLetters([...userLetters, lowerCaseWord]);
     } else {
       // Letra mala
-      console.log('Letra mala', ev.currentTarget.value);
+      console.log('Letra mala', lowerCaseWord);
     }
 
     // ev.currentTarget.value === /^[A-Za-z]+$/ ?  setLastLetter(ev.currentTarget.value)};
@@ -55,14 +73,11 @@ function App() {
         <section>
           <div className="solution">
             <h2 className="title">Solución:</h2>
-            <ul className="letters">{renderSolutionLetters()}
-            </ul>
+            <ul className="letters">{renderSolutionLetters()}</ul>
           </div>
           <div className="error">
             <h2 className="title">Letras falladas:</h2>
-            <ul className="letters">
-            {renderErrorLetters()}
-            </ul>
+            <ul className="letters">{renderErrorLetters()}</ul>
           </div>
           <form className="form">
             <label className="title" htmlFor="last-letter">
